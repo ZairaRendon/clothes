@@ -17,6 +17,7 @@ def create_app():
     from app.models.supplier import Supplier
     from app.models.sale import Sale
     from app.models.discount import Discount
+    from app.models.users import User
 
     with app.app_context():
         db.create_all()
