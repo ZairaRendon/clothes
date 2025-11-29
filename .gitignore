@@ -2,3 +2,16 @@ venv/
 .env
 .history/
 *.log
+
+# Ignorar cache de Python
+__pycache__/
+*/__pycache__/
+**/__pycache__/
+
+# Ignorar archivos compilados de Python
+*.pyc
+*.pyo
+*.pyd
+
+# Ignorar archivos de compilación parciales
+*.pyc
