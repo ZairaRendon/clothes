@@ -1,6 +1,10 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
+
+from .routes.main import main_bp
+from .routes.auth import auth_bp
+
 # Inicializamos SQLAlchemy
 db = SQLAlchemy()
 
@@ -21,5 +25,8 @@ def create_app():
 
     with app.app_context():
         db.create_all()
-    
+
+
+    app.register_blueprint(main_bp)
+    app.register_blueprint(auth_bp)
     return app
