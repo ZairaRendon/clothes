@@ -1,12 +1,14 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate 
 
 
 from .routes.main import main_bp
 from .routes.auth import auth_bp
 
-# Inicializamos SQLAlchemy
+# Inicializar SQLAlchemy
 db = SQLAlchemy()
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
@@ -14,6 +16,7 @@ def create_app():
     app.config.from_object("app.config.Config")
     
     db.init_app(app)
+    migrate.init_app(app, db)
     
     from app.models.product import Product
     from app.models.variation import ProductVariation
@@ -23,9 +26,8 @@ def create_app():
     from app.models.discount import Discount
     from app.models.users import User
 
-    with app.app_context():
-        db.create_all()
-
+    #with app.app_context():
+    #    db.create_all()
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
