@@ -1,4 +1,4 @@
-from app import db
+from app.extensions import db
 
 class Product(db.Model):
     __tablename__ = "products"
@@ -8,6 +8,7 @@ class Product(db.Model):
     description = db.Column(db.String(255))
     price = db.Column(db.Float, nullable=False)
     stock = db.Column(db.Integer, nullable=False, default=0)
+    supplier_id = db.Column(db.Integer, db.ForeignKey("suppliers.id"), nullable=True)  # ← AGREGAR ESTA LÍNEA
 
     variations = db.relationship("ProductVariation", backref="product", lazy=True)
     discounts = db.relationship("Discount", backref="product", lazy=True)

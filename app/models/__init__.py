@@ -1,6 +1,2 @@
-from .product import Product
-from .variation import ProductVariation
-from .customer import Customer
-from .supplier import Supplier
-from .sale import Sale
-from .discount import Discount
+# app/models/__init__.py
+# Este archivo permite que Python reconozca models como un paquete

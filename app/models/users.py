@@ -1,5 +1,5 @@
-from app import db
 from datetime import datetime
+from app.extensions import db
 
 class User(db.Model):
     __tablename__ = "users"
@@ -10,7 +10,6 @@ class User(db.Model):
     role = db.Column(db.String(50), nullable=False, default="user")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relación con ventas
     sales = db.relationship("Sale", backref="user", lazy=True)
 
     def __repr__(self):
