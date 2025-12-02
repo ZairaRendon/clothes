@@ -30,7 +30,7 @@ def login():
     return render_template("login.html")
 
 
-@auth_bp.get("/register")
+@auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
         name = request.form.get("name")
@@ -67,7 +67,7 @@ def register():
 
         try:
             db.session.add(new_user)
-            db.session.comiit()
+            db.session.commit()
             flash("Cuenta creada exitosamente", "success")
             return redirect(url_for("auth.login"))
         except Exception as e:
