@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Ventas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Registro de Ventas</h2>
+        <a href="{{ url_for('sales.new_sale') }}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Nueva Venta
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Ventas</h5>
+                    <h2>{{ sales.total }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Ventas Hoy</h5>
+                    <h2>$0.00</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Este Mes</h5>
+                    <h2>$0.00</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de ventas -->
+    {% if sales.items %}
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Total</th>
+                                <th>Método de Pago</th>
+                                <th>Estado</th>
+                                <th>Vendedor</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in sales.items %}
+                            <tr>
+                                <td><strong>#{{ sale.id }}</strong></td>
+                                <td>{{ sale.date.strftime('%d/%m/%Y %H:%M') }}</td>
+                                <td>
+                                    {% if sale.customer %}
+                                        {{ sale.customer.name }}
+                                    {% else %}
+                                        <span class="text-muted">Cliente general</span>
+                                    {% endif %}
+                                </td>
+                                <td><strong>${{ "%.2f"|format(sale.total) }}</strong></td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ sale.payment_method }}</span>
+                                </td>
+                                <td>
+                                    {% if sale.status == 'completada' %}
+                                        <span class="badge bg-success">Completada</span>
+                                    {% elif sale.status == 'pendiente' %}
+                                        <span class="badge bg-warning">Pendiente</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Cancelada</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ sale.user.name }}</td>
+                                <td>
+                                    <a href="{{ url_for('sales.view_sale', id=sale.id) }}" 
+                                       class="btn btn-sm btn-info">
+                                        👁️ Ver
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginación -->
+                {% if sales.pages > 1 %}
+                <nav aria-label="Page navigation" class="mt-3">
+                    <ul class="pagination justify-content-center">
+                        {% if sales.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('sales.list_sales', page=sales.prev_num) }}">Anterior</a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for page_num in sales.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                            {% if page_num %}
+                                <li class="page-item {% if page_num == sales.page %}active{% endif %}">
+                                    <a class="page-link" href="{{ url_for('sales.list_sales', page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if sales.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('sales.list_sales', page=sales.next_num) }}">Siguiente</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <h5>No hay ventas registradas</h5>
+            <p>Comienza registrando tu primera venta.</p>
+            <a href="{{ url_for('sales.new_sale') }}" class="btn btn-primary">Nueva Venta</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

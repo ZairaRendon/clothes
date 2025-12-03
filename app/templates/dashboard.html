@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2>Dashboard</h2>
+            <p class="lead">Bienvenido, <strong>{{ session.user_name }}</strong>!</p>
+        </div>
+    </div>
+
+    <!-- Tarjetas de estadísticas -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">📦 Productos</h5>
+                    <h2 class="card-text">--</h2>
+                    <small>Total en inventario</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">💰 Ventas Hoy</h5>
+                    <h2 class="card-text">$0.00</h2>
+                    <small>Ingresos del día</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">📈 Este Mes</h5>
+                    <h2 class="card-text">$0.00</h2>
+                    <small>Ventas del mes</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">⚠️ Stock Bajo</h5>
+                    <h2 class="card-text">0</h2>
+                    <small>Productos con poco stock</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accesos rápidos -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h4>Accesos Rápidos</h4>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h1>🛒</h1>
+                    <h5 class="card-title">Nueva Venta</h5>
+                    <p class="card-text">Registra una nueva venta</p>
+                    <a href="{{ url_for('sales.new_sale') }}" class="btn btn-success">Ir</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h1>📦</h1>
+                    <h5 class="card-title">Inventario</h5>
+                    <p class="card-text">Ver y gestionar productos</p>
+                    <a href="{{ url_for('inventory.list_products') }}" class="btn btn-primary">Ir</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h1>➕</h1>
+                    <h5 class="card-title">Agregar Producto</h5>
+                    <p class="card-text">Añadir nuevo al inventario</p>
+                    <a href="{{ url_for('inventory.add_product') }}" class="btn btn-success">Ir</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del usuario -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">👤 Mi Información</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Nombre:</strong> {{ session.user_name }}</p>
+                    <p><strong>Rol:</strong> 
+                        {% if session.user_role == 'admin' %}
+                            <span class="badge bg-danger">Administrador</span>
+                        {% else %}
+                            <span class="badge bg-primary">Usuario</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>ID:</strong> {{ session.user_id }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">🔗 Enlaces Útiles</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a href="{{ url_for('sales.list_sales') }}">📋 Ver todas mis ventas</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="{{ url_for('inventory.list_products') }}">🔍 Buscar productos</a>
+                        </li>
+                        {% if session.user_role == 'admin' %}
+                        <li class="list-group-item">
+                            <a href="{{ url_for('main.admin_panel') }}">⚙️ Panel de administración</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

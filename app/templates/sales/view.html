@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Venta #{{ sale.id }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Venta #{{ sale.id }}</h4>
+                    {% if sale.status == 'completada' %}
+                        <span class="badge bg-success">Completada</span>
+                    {% elif sale.status == 'pendiente' %}
+                        <span class="badge bg-warning">Pendiente</span>
+                    {% else %}
+                        <span class="badge bg-danger">Cancelada</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <!-- Mensajes flash -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Información general -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p><strong>Fecha:</strong> {{ sale.date.strftime('%d/%m/%Y %H:%M') }}</p>
+                            <p><strong>Vendedor:</strong> {{ sale.user.name }}</p>
+                            <p><strong>Cliente:</strong> 
+                                {% if sale.customer %}
+                                    {{ sale.customer.name }}
+                                {% else %}
+                                    <span class="text-muted">Cliente general</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Método de pago:</strong> 
+                                <span class="badge bg-secondary">{{ sale.payment_method }}</span>
+                            </p>
+                            <p><strong>Total:</strong> 
+                                <span class="h4 text-success">${{ "%.2f"|format(sale.total) }}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    {% if sale.notes %}
+                        <div class="alert alert-secondary">
+                            <strong>Notas:</strong> {{ sale.notes }}
+                        </div>
+                    {% endif %}
+
+                    <!-- Productos vendidos -->
+                    <h5>Productos</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Precio Unit.</th>
+                                    <th>Cantidad</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in sale_items %}
+                                <tr>
+                                    <td>{{ item.product.name }}</td>
+                                    <td>${{ "%.2f"|format(item.unit_price) }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td><strong>${{ "%.2f"|format(item.subtotal) }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                                <tr class="table-success">
+                                    <td colspan="3" class="text-end"><strong>TOTAL:</strong></td>
+                                    <td><strong>${{ "%.2f"|format(sale.total) }}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Acciones -->
+                    <div class="mt-4">
+                        <a href="{{ url_for('sales.list_sales') }}" class="btn btn-secondary">Volver a Ventas</a>
+                        
+                        {% if sale.status == 'completada' %}
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                                Cancelar Venta
+                            </button>
+                        {% endif %}
+                        
+                        <button class="btn btn-primary" onclick="window.print()">Imprimir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Detalles</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Items vendidos:</strong> {{ sale_items|length }}</p>
+                    <p><strong>ID de venta:</strong> #{{ sale.id }}</p>
+                    <p><strong>Estado:</strong> 
+                        {% if sale.status == 'completada' %}
+                            <span class="badge bg-success">Completada</span>
+                        {% elif sale.status == 'pendiente' %}
+                            <span class="badge bg-warning">Pendiente</span>
+                        {% else %}
+                            <span class="badge bg-danger">Cancelada</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de cancelación -->
+<div class="modal fade" id="cancelModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar cancelación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de cancelar esta venta? El stock de los productos será restaurado.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <form method="POST" action="{{ url_for('sales.cancel_sale', id=sale.id) }}" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Cancelar Venta</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

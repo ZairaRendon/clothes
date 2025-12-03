@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">👁️ Detalles del Producto</h4>
+                </div>
+                <div class="card-body">
+                    <h3>{{ product.name }}</h3>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <p><strong>ID:</strong> {{ product.id }}</p>
+                            <p><strong>Precio:</strong> ${{ "%.2f"|format(product.price) }}</p>
+                            <p><strong>Stock disponible:</strong> 
+                                {% if product.stock <= 5 %}
+                                    <span class="badge bg-danger">{{ product.stock }} unidades</span>
+                                {% elif product.stock <= 20 %}
+                                    <span class="badge bg-warning">{{ product.stock }} unidades</span>
+                                {% else %}
+                                    <span class="badge bg-success">{{ product.stock }} unidades</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Proveedor:</strong> 
+                                {% if product.supplier_id %}
+                                    ID: {{ product.supplier_id }}
+                                {% else %}
+                                    <span class="text-muted">No asignado</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <strong>Descripción:</strong>
+                        <p>{{ product.description if product.description else 'Sin descripción' }}</p>
+                    </div>
+
+                    <hr>
+
+                    <h5>Variaciones del producto</h5>
+                    {% if variations %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Talla</th>
+                                        <th>Color</th>
+                                        <th>Stock</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for variation in variations %}
+                                    <tr>
+                                        <td>{{ variation.size }}</td>
+                                        <td>{{ variation.color }}</td>
+                                        <td>{{ variation.stock }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No hay variaciones registradas para este producto.</p>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <a href="{{ url_for('inventory.list_products') }}" class="btn btn-secondary">Volver al inventario</a>
+                        <a href="{{ url_for('inventory.edit_product', id=product.id) }}" class="btn btn-warning">Editar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Acciones rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('inventory.edit_product', id=product.id) }}" class="btn btn-warning">
+                            ✏️ Editar producto
+                        </a>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            🗑️ Eliminar producto
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de eliminar el producto <strong>{{ product.name }}</strong>? Esta acción no se puede deshacer.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="POST" action="{{ url_for('inventory.delete_product', id=product.id) }}" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Eliminar definitivamente</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
